@@ -1,19 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfigService } from './database/mongoose-config.service';
-import databaseConfig from './database/config/database.config';
-import { DatabaseConfig } from './database/config/database-config.type';
 
 // <database-block>
-const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
-  .isDocumentDatabase
-  ? MongooseModule.forRootAsync({
-      useClass: MongooseConfigService,
-    })
-  : null;
+const infrastructureDatabaseModule = MongooseModule.forRootAsync({
+  useClass: MongooseConfigService,
+});
 // </database-block>
 
 @Module({
@@ -23,7 +19,8 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
       envFilePath: '.env',
     }),
     infrastructureDatabaseModule,
+    AuthModule,
+    UsersModule,
   ],
-  AuthModule,
 })
-export class AuthServerModule {}
+export class AppModule {}

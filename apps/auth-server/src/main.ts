@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
-import { AuthServerModule } from './auth-server.module';
+import { AppModule } from './app.module';
 import {
   ClassSerializerInterceptor,
   ValidationPipe,
@@ -10,11 +10,11 @@ import {
 import validationOptions from './utils/validation-options';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthServerModule);
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
   // 1) class-validator에 Nest DI 컨테이너 연결
-  useContainer(app.select(AuthServerModule), { fallbackOnErrors: true });
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // 보안 관련 미들웨어 생략
 
