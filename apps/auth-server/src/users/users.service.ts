@@ -20,10 +20,7 @@ export class UsersService {
     return user;
   }
 
-  async update(
-    id: UserDocument['_id'],
-    dto: UpdateUserDto,
-  ): Promise<UserDocument> {
+  async update(id: UserDocument['_id'], dto: UpdateUserDto): Promise<UserDocument> {
     this.logger.log(`Updating user with ID: ${JSON.stringify(dto)}`);
     const user = await this.userModel.findById(id);
     // 객체에 변경사항 적용

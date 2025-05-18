@@ -4,8 +4,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
-  userId: string;
-  roles: string[];
+  email: string;
+  role: string;
   iat?: number;
   exp?: number;
 }
@@ -13,18 +13,19 @@ export interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly configService: ConfigService) {
-    const jwtSecret = configService.get<string>('JWT_SECRET');
-    if (!jwtSecret) {
+    const accessJwtSecret = configService.get<string>('JWT_SECRET');
+    const refreshJwtSecret = configService.get<string>('JWT_REFRESH_SECRET');
+    if (!accessJwtSecret || !refreshJwtSecret) {
       throw new Error('JWT_SECRET is not defined in environment variables');
     }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtSecret,
+      secretOrKey: accessJwtSecret,
     });
   }
 
   validate(payload: JwtPayload) {
-    return { userId: payload.userId, roles: payload.roles };
+    return { email: payload.email, role: payload.role };
   }
 }

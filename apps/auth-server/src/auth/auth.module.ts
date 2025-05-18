@@ -9,13 +9,10 @@ import { AuthController } from './auth.controller';
 import { User, UserSchema } from '../users/schemas/users.schema';
 import { UsersModule } from '../users/users.module';
 import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema';
-// import { RefreshTokenSchema } from './schemas/refresh-token.schema';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 // import { LocalStrategy } from './local.strategy';
-// import { JwtStrategy } from './jwt.strategy';
 // import { JwtAuthGuard } from './jwt-auth.guard';
-// import { RefreshToken, RefreshTokenSchema } from '../refresh-tokens/refresh-token.schema';
-// import { RefreshTokensModule } from '../refresh-tokens/refresh-tokens.module';
 
 @Module({
   imports: [
@@ -37,8 +34,8 @@ import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema
     ConfigModule,
     UsersModule,
   ],
-  providers: [AuthService],
-  // providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy],
+  // providers: [AuthService, LocalStrategy, JwtAuthGuard],
   controllers: [AuthController],
   exports: [AuthService],
 })

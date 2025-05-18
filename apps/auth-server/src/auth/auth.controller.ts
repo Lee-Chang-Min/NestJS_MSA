@@ -9,22 +9,22 @@ import {
   ClassSerializerInterceptor,
   UseGuards,
   Req,
+  HttpException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UserDocument } from '../users/schemas/users.schema';
 import { LoginDto } from './dto/login.dto';
 
 // import { AuthGuard } from '@nestjs/passport'; // Passport의 기본 AuthGuard
 // import { LocalAuthGuard } from './guards/local-auth.guard'; // 만약 LocalAuthGuard를 만들었다면
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 export interface AuthenticatedRequest extends Request {
   user: {
-    userId: string;
-    username: string;
-    roles: string[];
+    email: string;
+    role: string;
   };
 }
 
@@ -41,17 +41,26 @@ export class AuthController {
    * POST /auth/register
    */
   @Post('register')
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: 201, description: 'User created.' })
   @HttpCode(HttpStatus.CREATED) // 성공 시 201 Created 반환
-  async register(
-    @Body() dto: CreateUserDto,
-  ): Promise<{ result: string; id: string; message: string }> {
-    const registeredUser: UserDocument = await this.authService.register(dto);
-    // this.logger.log(`User ${dto.username} registered successfully with ID: ${registeredUser._id}`);
-    return {
-      result: 'success',
-      id: registeredUser._id.toString(),
-      message: '회원가입이 성공적으로 완료되었습니다.',
-    };
+  async register(@Body() dto: CreateUserDto): Promise<{ result: string; id?: string; message: string }> {
+    try {
+      await this.authService.register(dto);
+      return {
+        result: 'success',
+        message: '회원가입이 성공적으로 완료되었습니다.',
+      };
+    } catch (error) {
+      this.logger.error(`회원가입 실패: ${error}`);
+      throw new HttpException(
+        {
+          result: 'fail',
+          message: `회원가입 처리 중 오류가 발생했습니다`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   /**
@@ -60,13 +69,24 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK) // 성공 시 200 OK 반환
   async login(@Body() loginDto: LoginDto): Promise<{ accessToken: string }> {
-    // 1. 사용자 자격 증명 검증 (AuthService.validateUser는 실패 시 UnauthorizedException 발생)
-    const user = await this.authService.verifyUser(loginDto);
-    // 2. 토큰 발행
-    const token = await this.authService.login(user);
+    try {
+      // 1. 사용자 자격 증명 검증 (AuthService.validateUser는 실패 시 UnauthorizedException 발생)
+      const user = await this.authService.verifyUser(loginDto);
+      // 2. 토큰 발행
+      const token = await this.authService.login(user);
 
-    this.logger.log(`User ${user.username} logged in successfully.`);
-    return token;
+      this.logger.log(`User ${user.username} logged in successfully.`);
+      return token;
+    } catch (error) {
+      this.logger.error(`로그인 실패: ${error}`);
+      throw new HttpException(
+        {
+          result: 'fail',
+          message: `로그인 실패`,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**
@@ -75,33 +95,49 @@ export class AuthController {
    * 요청 헤더의 Bearer 토큰으로 인증된 사용자
    * Body 의 refreshToken 으로 해당 토큰을 블랙리스트 처리
    */
-  @UseGuards(AuthGuard('jwt')) // 'jwt'는 JwtStrategy를 사용하도록 PassportModule에 설정된 기본값 또는 이름
+  @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @Req() req: AuthenticatedRequest,
-    @Body() refreshToken: { refreshToken: string },
-  ): Promise<{ message: string }> {
-    // req.user에는 JwtStrategy의 validate 메소드에서 반환한 페이로드 정보가 들어있습니다.
-    const { userId, username } = req.user;
-    this.logger.log(`User ${username} (ID: ${userId}) requested logout.`);
+  async logout(@Req() req: AuthenticatedRequest): Promise<{ result: string; message: string }> {
+    try {
+      const { email } = req.user;
+      this.logger.log(`User ${email} requested logout.`);
 
-    await this.authService.logout(/* req.user */); // 필요하다면 사용자 정보를 넘겨줄 수 있음
+      await this.authService.logout(email); // 필요하다면 사용자 정보를 넘겨줄 수 있음
 
-    return { message: '성공적으로 로그아웃되었습니다.' };
+      return { result: 'success', message: '성공적으로 로그아웃되었습니다.' };
+    } catch (error) {
+      this.logger.error(`로그아웃 실패: ${error}`);
+      throw new HttpException(
+        {
+          result: 'fail',
+          message: `로그아웃 실패`,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**
-   * (선택 사항) 현재 로그인된 사용자 정보 확인 (토큰 테스트용)
-   * GET /auth/profile 또는 /auth/me
-   * JWT 기반 인증 필요
+   * 토큰 재발급
+   * POST /auth/refresh
    */
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get('profile') // 또는 'me'
-  // getProfile(@Req() req: AuthenticatedRequest): AuthenticatedRequest['user'] {
-  //   this.logger.log(`Workspaceing profile for user: ${req.user.username} (ID: ${req.user.userId})`);
-  //   // req.user는 JwtStrategy의 validate 메소드에서 반환된 값입니다.
-  //   // (예: { userId: '...', username: '...', roles: ['...'] })
-  //   return req.user;
-  // }
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body() refreshDto: RefreshTokenDto): Promise<{ result: string; accessToken: string; refreshToken: string }> {
+    try {
+      const { refreshtoken } = refreshDto;
+      const token = await this.authService.refreshToken(refreshtoken);
+      return { result: 'success', accessToken: token.accessToken, refreshToken: token.refreshToken };
+    } catch (error) {
+      this.logger.error(`토큰 재발급 실패: ${error}`);
+      throw new HttpException(
+        {
+          result: 'fail',
+          message: `토큰 재발급 실패`,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
 }

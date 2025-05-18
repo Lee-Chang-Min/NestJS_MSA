@@ -66,10 +66,7 @@ UserSchema.pre<UserDocument>('save', async function (next) {
 });
 
 // 비밀번호 비교를 위한 인스턴스 메소드
-UserSchema.methods.comparePassword = async function (
-  this: UserDocument,
-  candidatePassword: string,
-): Promise<boolean> {
+UserSchema.methods.comparePassword = async function (this: UserDocument, candidatePassword: string): Promise<boolean> {
   if (!this.password) {
     return false;
   }

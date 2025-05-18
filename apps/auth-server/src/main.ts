@@ -2,11 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
-import {
-  Logger,
-  ClassSerializerInterceptor,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Logger, ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import validationOptions from './utils/validation-options';
 import helmet from 'helmet';
 import * as compression from 'compression';
