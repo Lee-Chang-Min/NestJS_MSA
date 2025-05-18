@@ -3,11 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import {
+  Logger,
   ClassSerializerInterceptor,
   ValidationPipe,
-  VersioningType,
 } from '@nestjs/common';
 import validationOptions from './utils/validation-options';
+import helmet from 'helmet';
+import * as compression from 'compression';
+import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,12 +20,14 @@ async function bootstrap() {
   // 1) class-validator에 Nest DI 컨테이너 연결
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  // 보안 관련 미들웨어 생략
+  app.use(helmet());
+  app.use(compression());
+  app.use(morgan('combined'));
+  app.use(cookieParser());
 
-  // 2) 글로벌 URL 프리픽스 및 버전링
+  // 2) 글로벌 URL 프리픽스
   const apiPrefix = configService.get<string>('API_PREFIX', 'api');
   app.setGlobalPrefix(apiPrefix);
-  app.enableVersioning({ type: VersioningType.URI });
 
   // 3) 글로벌 유효성 검사 파이프
   app.useGlobalPipes(new ValidationPipe(validationOptions));
@@ -32,7 +38,7 @@ async function bootstrap() {
   const port = configService.get<number>('AUTH_PORT') || 3001; // .env 파일의 AUTH_PORT 사용
 
   await app.listen(port);
-  console.log(`Auth server is running on: ${await app.getUrl()}`);
+  Logger.log(`Auth server is running on: ${await app.getUrl()}`);
 }
 
 void bootstrap();

@@ -1,10 +1,14 @@
 // src/auth/schemas/user.schema.ts
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { Exclude } from 'class-transformer';
 
-export type UserDocument = User & Document;
+export interface UserDocument extends Document, User {
+  _id: Types.ObjectId; // _id 타입을 명시적으로 지정
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
 
 // 사용자 역할을 정의.
 export enum UserRole {
@@ -23,6 +27,7 @@ export class User {
   username: string;
 
   @Prop({ required: true })
+  @Exclude()
   password: string;
 
   @Prop({
