@@ -17,9 +17,10 @@ import { LoginDto } from './dto/login.dto';
 
 // import { AuthGuard } from '@nestjs/passport'; // Passport의 기본 AuthGuard
 // import { LocalAuthGuard } from './guards/local-auth.guard'; // 만약 LocalAuthGuard를 만들었다면
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 
 export interface AuthenticatedRequest extends Request {
   user: {
@@ -43,6 +44,7 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created.' })
+  @ApiResponse({ status: 400, description: 'Bad Request - Invalid input or user already exists.' })
   @HttpCode(HttpStatus.CREATED) // 성공 시 201 Created 반환
   async register(@Body() dto: CreateUserDto): Promise<{ result: string; id?: string; message: string }> {
     try {
@@ -53,6 +55,9 @@ export class AuthController {
       };
     } catch (error) {
       this.logger.error(`회원가입 실패: ${error}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           result: 'fail',
@@ -66,9 +71,16 @@ export class AuthController {
   /**
    * 사용자 로그인
    */
-  @Post('login')
-  @HttpCode(HttpStatus.OK) // 성공 시 200 OK 반환
-  async login(@Body() loginDto: LoginDto): Promise<{ accessToken: string }> {
+  // @Post('login')
+  // @ApiOperation({ summary: 'User login' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Login successful, returns access token.',
+  //   schema: { example: { accessToken: 'string', refreshToken: 'string' } },
+  // })
+  // @ApiResponse({ status: 401, description: 'Unauthorized - Invalid credentials.' })
+  @MessagePattern('auth_login')
+  async login(@Payload() loginDto: LoginDto): Promise<{ accessToken: string }> {
     try {
       // 1. 사용자 자격 증명 검증 (AuthService.validateUser는 실패 시 UnauthorizedException 발생)
       const user = await this.authService.verifyUser(loginDto);
@@ -79,13 +91,17 @@ export class AuthController {
       return token;
     } catch (error) {
       this.logger.error(`로그인 실패: ${error}`);
-      throw new HttpException(
-        {
-          result: 'fail',
-          message: `로그인 실패`,
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      if (error instanceof HttpException) {
+        throw new RpcException({
+          status: error.getStatus(), // HTTP status 사용
+          message: error.message,
+          error: error.getResponse(),
+        });
+      }
+      throw new RpcException({
+        status: 500,
+        message: 'Internal server error',
+      });
     }
   }
 
@@ -96,7 +112,11 @@ export class AuthController {
    * Body 의 refreshToken 으로 해당 토큰을 블랙리스트 처리
    */
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth() // Swagger에서 JWT 토큰 인증 필요 명시
   @Post('logout')
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({ status: 200, description: 'Logout successful.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or expired token.' })
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: AuthenticatedRequest): Promise<{ result: string; message: string }> {
     try {
@@ -108,6 +128,9 @@ export class AuthController {
       return { result: 'success', message: '성공적으로 로그아웃되었습니다.' };
     } catch (error) {
       this.logger.error(`로그아웃 실패: ${error}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           result: 'fail',
@@ -123,6 +146,13 @@ export class AuthController {
    * POST /auth/refresh
    */
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Token refreshed successfully.',
+    schema: { example: { result: 'success', accessToken: 'string', refreshToken: 'string' } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or expired refresh token.' })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshDto: RefreshTokenDto): Promise<{ result: string; accessToken: string; refreshToken: string }> {
     try {
@@ -131,6 +161,9 @@ export class AuthController {
       return { result: 'success', accessToken: token.accessToken, refreshToken: token.refreshToken };
     } catch (error) {
       this.logger.error(`토큰 재발급 실패: ${error}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           result: 'fail',

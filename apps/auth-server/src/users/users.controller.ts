@@ -61,7 +61,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update user role or password' })
+  @ApiOperation({ summary: 'Update user role' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -89,6 +89,9 @@ export class UsersController {
       };
     } catch (error) {
       this.logger.error(`User update failed: ${error}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           result: 'fail',
@@ -115,6 +118,9 @@ export class UsersController {
       this.logger.log(`User deleted: ${id.toString()}`);
     } catch (error) {
       this.logger.error(`User delete failed: ${error}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           result: 'fail',

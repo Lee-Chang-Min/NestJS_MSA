@@ -29,23 +29,22 @@ export class AuthService {
    * 사용자 회원가입 처리
    */
   async register(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const user = await this.usersService.create(createUserDto);
-    return user;
+    return this.usersService.create(createUserDto);
   }
 
   /**
    * 사용자 검증
    * @return 검증된 User 객체
-   * @param signInUserDto LoginDto
+   * @param loginDto LoginDto
    */
-  async verifyUser(LoginDto: LoginDto): Promise<UserDocument> {
-    const user = await this.usersService.findByEmail(LoginDto.email);
+  async verifyUser(loginDto: LoginDto): Promise<UserDocument> {
+    const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
-      throw new Error('username or password is wrong');
+      throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다');
     }
 
     // 비밀번호 검증
-    const isPasswordValid = await user.comparePassword(LoginDto.password);
+    const isPasswordValid = await user.comparePassword(loginDto.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('username or password is wrong');
     }
@@ -57,21 +56,12 @@ export class AuthService {
    * 사용자 로그인 처리
    */
   async login(user: UserDocument): Promise<{ accessToken: string; refreshToken: string }> {
-    // JWT 토큰 발급
-    const payload = {
-      email: user.email,
-      role: user.role,
-    };
-    const accessToken = await this.jwtService.signAsync(payload);
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
-    });
+    // 토큰 생성
+    const tokens = await this.generateTokens(user);
+    // refreshToken 저장
+    await this.saveRefreshToken(tokens.refreshToken, user._id.toString());
 
-    //refreshToken 저장
-    await this.refreshTokenModel.create({ token: refreshToken, userId: user._id.toString(), issuedAt: new Date(), isRevoked: false });
-
-    return { accessToken, refreshToken };
+    return tokens;
   }
 
   /**
@@ -93,6 +83,7 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     // 1) 기존 refreshToken 유효성 검증
     const payload = this.jwtService.verify<TokenPayload>(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
+
     const user = await this.usersService.findByEmail(payload.email);
     if (!user) {
       throw new UnauthorizedException('username or password is wrong');
@@ -104,20 +95,41 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // 3) 토큰 만료 처리
+    // 3) 기존 토큰 만료 처리
     await this.refreshTokenModel.updateOne({ _id: stored._id }, { $set: { isRevoked: true } });
 
     // 4) 새로운 토큰 발급
-    const tokenPayload = { email: payload.email, role: payload.role };
-    const accessToken = this.jwtService.sign(tokenPayload);
-    const newRefreshToken = this.jwtService.sign(tokenPayload, {
+    const tokens = await this.generateTokens(user);
+
+    // 5) DB에 새로운 refreshToken 저장
+    await this.saveRefreshToken(tokens.refreshToken, user._id.toString());
+
+    return tokens;
+  }
+
+  /**
+   * 토큰 생성 메소드
+   * @private
+   */
+  private async generateTokens(user: UserDocument): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload: TokenPayload = {
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
     });
+    return { accessToken, refreshToken };
+  }
 
-    // 5) DB에 새로운 refreshToken 저장
-    await this.refreshTokenModel.create({ token: newRefreshToken, userId: user._id.toString(), issuedAt: new Date(), isRevoked: false });
-
-    return { accessToken, refreshToken: newRefreshToken };
+  /**
+   * 리프레시 토큰 저장 메소드
+   * @private
+   */
+  private async saveRefreshToken(token: string, userId: string): Promise<void> {
+    await this.refreshTokenModel.create({ token, userId, issuedAt: new Date(), isRevoked: false });
   }
 }
