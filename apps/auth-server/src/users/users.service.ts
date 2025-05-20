@@ -20,12 +20,12 @@ export class UsersService {
     return user;
   }
 
-  async update(id: UserDocument['_id'], dto: UpdateUserDto): Promise<UserDocument> {
-    this.logger.log(`Updating user with ID: ${JSON.stringify(dto)}`);
-    const user = await this.userModel.findById(id);
+  async update(dto: UpdateUserDto): Promise<UserDocument> {
+    this.logger.log(`Updating user with ID: ${JSON.stringify(dto.userID)}`);
+    const user = await this.userModel.findById(dto.userID);
     // 객체에 변경사항 적용
     if (!user) {
-      throw new NotFoundException(`User with ID ${String(id)} not found`);
+      throw new NotFoundException(`User with ID ${String(dto.userID)} not found`);
     }
     Object.assign(user, dto);
     // save 메소드를 호출하여 pre 훅 트리거

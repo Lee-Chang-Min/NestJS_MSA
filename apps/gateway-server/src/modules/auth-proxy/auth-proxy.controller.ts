@@ -7,6 +7,8 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   Req,
+  Patch,
+  Delete,
   // UseGuards,
   // Get,
 } from '@nestjs/common';
@@ -19,7 +21,8 @@ import { AUTH_SERVICE_TOKEN } from '../../microservices/client-proxy.provider';
 import { Public } from '../../common/decorators/public.decorator';
 import { CreateUserDto } from '../../../../libs/shared/dto/auth/create-user.dto';
 import { LoginDto } from '../../../../libs/shared/dto/auth/login.dto';
-import { RefreshTokenDto } from 'apps/auth-server/src/auth/dto/refresh-token.dto';
+import { RefreshTokenDto } from '../../../../libs/shared/dto/auth/refresh-token.dto';
+import { UpdateUserDto } from '../../../../libs/shared/dto/auth/update-user.dto';
 
 export interface AuthenticatedRequest extends Request {
   user: {
@@ -39,6 +42,8 @@ const AUTH_MESSAGE_PATTERNS = {
   LOGIN: 'auth.login',
   LOGOUT: 'auth.logout',
   REFRESH: 'auth.refresh',
+  UPDATE: 'users.update',
+  DELETE: 'users.delete',
 };
 
 @ApiTags('Auth v1')
@@ -104,6 +109,36 @@ export class AuthProxyController {
       return firstValueFrom(this.authClient.send(AUTH_MESSAGE_PATTERNS.REFRESH, refreshTokenDto));
     } catch (error) {
       this.logger.error(`[Gateway] Error refreshing tokens: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * 사용자 업데이트 => 로그인 한 사용자 정보 업데이트 (본인 정보만 수정 가능한 경우만 가정하였습니다.)
+   */
+  @Patch('update')
+  async update(@Req() req: AuthenticatedRequest, @Body() updateUserDto: UpdateUserDto): Promise<any> {
+    try {
+      const userID = req.user.userID;
+      this.logger.log(`[Gateway] Forwarding 'PATCH /v1/auth/update' to AUTH_SERVICE`);
+      return firstValueFrom(this.authClient.send(AUTH_MESSAGE_PATTERNS.UPDATE, { ...updateUserDto, userID }));
+    } catch (error) {
+      this.logger.error(`[Gateway] Error updating user: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * 사용자 삭제 => 로그인 한 사용자 삭제 (본인 정보만 삭제 가능한 경우만 가정하였습니다.)
+   */
+  @Delete('delete')
+  async delete(@Req() req: AuthenticatedRequest): Promise<any> {
+    try {
+      const userID = req.user.userID;
+      this.logger.log(`[Gateway] Forwarding 'DELETE /v1/auth/delete' to AUTH_SERVICE`);
+      return firstValueFrom(this.authClient.send(AUTH_MESSAGE_PATTERNS.DELETE, userID));
+    } catch (error) {
+      this.logger.error(`[Gateway] Error deleting user: ${error}`);
       throw error;
     }
   }

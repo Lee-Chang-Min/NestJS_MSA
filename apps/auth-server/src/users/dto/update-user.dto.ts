@@ -1,8 +1,16 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, MinLength, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MinLength, IsEnum } from 'class-validator';
 import { UserRole } from '../schemas/users.schema';
 
 export class UpdateUserDto {
+  @ApiPropertyOptional({
+    description: '사용자 ID',
+    example: '664664664664664664664664',
+  })
+  @IsNotEmpty()
+  @IsString()
+  userID: string;
+
   @ApiPropertyOptional({
     description: '사용자 역할',
     enum: UserRole,
