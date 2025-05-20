@@ -1,4 +1,4 @@
-import { Logger, Provider } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { throwError, Observable } from 'rxjs';
@@ -29,6 +29,14 @@ interface ClientProxyWith extends ClientProxy {
   port?: string;
 }
 
+interface CustomError extends Error {
+  error?: {
+    result?: string;
+    message?: string;
+    status?: number;
+  };
+}
+
 export function sendWithTimeoutAndRetry<TResult = any, TInput = any>(
   client: ClientProxy,
   pattern: string | Record<string, any>,
@@ -38,23 +46,28 @@ export function sendWithTimeoutAndRetry<TResult = any, TInput = any>(
   const port = (client as ClientProxyWith).port;
   const serviceName = port === '3001' ? 'AUTH-SERVICE' : port === '3002' ? 'EVENT-SERVICE' : 'UnknownService';
   const defaultTimeout = 5000;
-  const defaultRetries = 3; // 기본 재시도 3번
+  const defaultRetries = 0; // 기본 재시도 0번
 
   const currentTimeout = options?.timeoutMs ?? defaultTimeout;
   const currentRetryAttempts = options?.retryAttempts ?? defaultRetries;
 
-  GENERIC_CLIENT_PROXY_LOGGER.debug(`Sending message to ${serviceName} with pattern: ${JSON.stringify(pattern)}.`);
+  GENERIC_CLIENT_PROXY_LOGGER.debug(`Sending message to ${serviceName} with pattern: ${JSON.stringify(pattern)}. retry: ${currentRetryAttempts}`);
 
   return client.send<TResult, TInput>(pattern, data).pipe(
     timeout({ each: currentTimeout }), // 지정된 시간 내에 응답이 없으면 TimeoutError 발생
     retry({ count: currentRetryAttempts }), // Observable에서 에러 발생 시 지정된 횟수만큼 재구독(재시도)
-    catchError((error: Error) => {
-      GENERIC_CLIENT_PROXY_LOGGER.error(
-        `Failed to send message to ${serviceName} (pattern: ${JSON.stringify(pattern)}) after ${currentRetryAttempts} retries or timeout: ${error}`,
-        error.stack,
-      );
+    catchError((error: CustomError) => {
+      GENERIC_CLIENT_PROXY_LOGGER.error(`Failed to send message to ${serviceName} (pattern: ${JSON.stringify(pattern)})`, error.stack);
       // 에러를 그대로 throw하여 전역 RpcExceptionFilter 등에서 처리하도록 함
-      return throwError(() => error);
+
+      const standardError = {
+        result: 'fail',
+        message: error.message || '서비스 오류가 발생했습니다',
+        status: error.error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      };
+      const status = standardError.status || HttpStatus.INTERNAL_SERVER_ERROR;
+
+      return throwError(() => new HttpException(standardError, status));
     }),
   );
 }
@@ -78,7 +91,7 @@ export function createClientProxy(configService: ConfigService, serviceType: Ser
   const host = configService.get<string>(`${serviceType}_SERVICE_HOST`);
   const port = configService.get<number>(`${serviceType}_SERVICE_PORT`);
   const timeoutMs = configService.get<number>(`GATEWAY_SERVICE_TIMEOUT`, 5000);
-  const retryCount = configService.get<number>(`GATEWAY_SERVICE_RETRY_COUNT`, 3);
+  const retryCount = configService.get<number>(`GATEWAY_SERVICE_RETRY_COUNT`, 0); // 특정 경우일때 재시도 로직 적용 (default: 1)
 
   if (!host || !port) {
     throw new Error(`${serviceType}_SERVICE_HOST 또는 ${serviceType}_SERVICE_PORT 환경 변수가 설정되지 않았습니다.`);

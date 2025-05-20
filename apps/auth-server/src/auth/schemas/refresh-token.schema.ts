@@ -8,7 +8,7 @@ export interface RefreshTokenDocument extends Document, RefreshToken {
 @Schema({ timestamps: true })
 export class RefreshToken {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: Types.ObjectId;
+  userID: Types.ObjectId;
 
   @Prop({ required: true })
   token: string;
@@ -30,4 +30,4 @@ export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
 
 // 인덱스 설정
 RefreshTokenSchema.index({ token: 1 }, { unique: true });
-RefreshTokenSchema.index({ userId: 1 });
+RefreshTokenSchema.index({ userID: 1 });

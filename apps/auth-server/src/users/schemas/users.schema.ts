@@ -20,7 +20,7 @@ export enum UserRole {
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true, trim: true, lowercase: true })
+  @Prop({ required: true, trim: true, lowercase: true })
   email: string;
 
   @Prop({ required: true, unique: true, trim: true })
@@ -82,4 +82,4 @@ UserSchema.methods.comparePassword = async function (this: UserDocument, candida
 //   },
 // });
 
-UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ email: 1 });

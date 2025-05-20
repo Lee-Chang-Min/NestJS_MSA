@@ -36,7 +36,7 @@ export class CreateEventDto {
 
   @IsDateString()
   @IsNotEmpty()
-  startDate: string; // ISO 8601 형식의 날짜 문자열 (예: "2025-12-31T15:00:00.000Z")
+  startDate: string; // ISO 8601 형식의 날짜 문자열 (예: "2025-05-19T14:30:15+09:00")
 
   @IsDateString()
   @IsNotEmpty()
@@ -48,10 +48,9 @@ export class CreateEventDto {
 
   /**
    * 이벤트를 생성한 운영자/관리자의 User ID (Auth Server의 User ID)
-   * Gateway에서 인증 후 요청자 정보를 받아와서 채워줄 수도 있고,
-   * 클라이언트가 직접 보내는 경우 여기서 유효성 검사를 합니다.
+   * Gateway에서 인증 후 요청자 정보를 받아와서 채워짐
    */
   @IsMongoId()
-  @IsNotEmpty()
-  createdBy: string; // ObjectId 형식의 문자열
+  @IsOptional()
+  createdBy?: string; // ObjectId 형식의 문자열
 }

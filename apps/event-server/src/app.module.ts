@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfigService } from './database/mongoose-config.service';
 
 import { EventModule } from './event/event.module';
-
+import { RewardModule } from './reward/reward.module';
 // <database-block>
 const infrastructureDatabaseModule = MongooseModule.forRootAsync({
   useClass: MongooseConfigService,
@@ -20,6 +20,7 @@ const infrastructureDatabaseModule = MongooseModule.forRootAsync({
     }),
     infrastructureDatabaseModule,
     EventModule,
+    RewardModule,
   ],
 })
 export class AppModule {}

@@ -5,7 +5,8 @@ import { ConfigModule as NestConfigModule } from '@nestjs/config';
 // 기능 모듈
 import { ClientsModule } from './microservices/client.module';
 import { AuthProxyModule } from './modules/auth-proxy/auth-proxy.module';
-// import { EventProxyModule } from './modules/event-proxy/event-proxy.module';
+import { EventProxyModule } from './modules/event-proxy/event-proxy.module';
+import { JwtStrategy } from './common/strategies/jwt.strategy';
 // import { HealthModule } from './modules/health/health.module';
 
 // 공통 모듈
@@ -22,10 +23,9 @@ import { RolesGuard } from './common/guards/role.guard';
         abortEarly: false, // 모든 유효성 검사 오류를 한 번에 보고
       },
     }),
-    // 3. Microservice Clients Module
     ClientsModule,
     AuthProxyModule,
-    // EventProxyModule,
+    EventProxyModule,
     // HealthModule,
   ],
   controllers: [],
@@ -38,6 +38,7 @@ import { RolesGuard } from './common/guards/role.guard';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    JwtStrategy,
   ],
 })
 export class AppModule {}

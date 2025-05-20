@@ -8,5 +8,5 @@ export class RefreshTokenDto {
     required: true,
   })
   @IsString()
-  refreshtoken: string;
+  refreshToken: string;
 }

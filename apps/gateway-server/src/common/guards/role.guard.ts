@@ -38,7 +38,6 @@ export class RolesGuard implements CanActivate {
     const hasRequiredRole = requiredRoles.some((role) => user.role.includes(role));
 
     if (hasRequiredRole) {
-      this.logger.debug('User has required role(s). Access granted by RolesGuard.');
       return true;
     } else {
       this.logger.warn(
