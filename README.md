@@ -20,21 +20,27 @@
 </p>
 
 ## 소개
-안녕하세요. 이번 과제를 맡게된 개발자 이창민입니다.
-https://respected-wasp-a92.notion.site/174bfc29a92f80b5bf78e73500262c17
-## Project setup
 
+안녕하세요. 이번 과제를 맡게된 백엔드 개발자 이창민입니다.
+
+📋 [**저를 소개 합니다:)** ](https://respected-wasp-a92.notion.site/174bfc29a92f80b5bf78e73500262c17)
+
+## 🛠️ 프로젝트 설정
+
+### 1️⃣ 패키지 설치
 ```bash
 pnpm install
 ```
 
+### 2️⃣ 도커 컨테이너 실행
 ```bash
 docker compose up -d --build
 ```
-package.json 파일과 command.txt 파일 참고 부탁드립니다:)
 
-Postman으로 쉽게 테스트 해보실수 있도록 하였습니다. (시간 관계상 Swagger 문서를 작성하지 못했습니다.)
-maplestory.postman_collection.json 파일 참고 부탁드립니다.
+### 3️⃣ 참고 자료
+- **설정 및 명령어:** `package.json` 및 `command.txt` 파일 참고해주세요.
+- **API 테스트:** Postman으로 쉽게 테스트할 수 있도록 `maplestory.postman_collection.json` 파일을 제공합니다.
+  *(시간 관계상 Swagger 문서를 작성하지 못했습니다.)*
 
 ## 프로젝트 구조
 
@@ -273,8 +279,8 @@ apps/
 ### 2. 구현 미비 영역
 - `/event-server/src/request-reward` 디렉토리 내:
   - **보상 요청 처리 및 내역 확인 로직** 미완성
-  - 해당 로직에서 다음과 같은 고민을 하고 구현하고 싶었습니다.:
+  - 프로젝트 초기 구조 설계에 시간을 많이 소비하여, 해당 로직에서 구현하지 못한 것이 아쉽습니다.
     - **DB 동시성 제어** 전략: 비관적 락 vs 낙관적 락
-    - **중복 요청 방지 및 재처리 정책** 수립
-    - **정합성 유지를 위한 트랜잭션 처리 및 로그 기록 구조**
-    - 대용량 트레픽에 대한 Redis 분산 락 적용 고려
+    - **중복 요청 방지 및 재처리 정책** 
+    - **정합성 유지를 위한 트랜잭션 처리**
+    - 대량 트레픽에 대한 Redis 분산 락 적용 고려
