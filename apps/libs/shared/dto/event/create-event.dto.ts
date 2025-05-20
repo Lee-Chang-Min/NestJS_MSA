@@ -1,6 +1,11 @@
 import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsObject, ValidateNested, IsMongoId, MaxLength, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventStatus } from '../../../../event-server/src/event/schemas/event.schema'; // 이전 단계에서 생성한 스키마의 Enum
+
+enum EventStatus {
+  ACTIVE = 'active',
+  UPCOMING = 'upcoming',
+  EXPIRED = 'expired',
+}
 
 // 이벤트 조건에 대한 DTO (필요에 따라 더 구체화 가능)
 export class EventConditionDto {

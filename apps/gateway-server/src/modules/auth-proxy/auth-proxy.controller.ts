@@ -23,6 +23,8 @@ import { CreateUserDto } from '../../../../libs/shared/dto/auth/create-user.dto'
 import { LoginDto } from '../../../../libs/shared/dto/auth/login.dto';
 import { RefreshTokenDto } from '../../../../libs/shared/dto/auth/refresh-token.dto';
 import { UpdateUserDto } from '../../../../libs/shared/dto/auth/update-user.dto';
+import { Roles } from '../../common/decorators/role.decorator';
+import { Role } from '../../common/decorators/role.enum';
 
 export interface AuthenticatedRequest extends Request {
   user: {
@@ -114,8 +116,9 @@ export class AuthProxyController {
   }
 
   /**
-   * 사용자 업데이트 => 로그인 한 사용자 정보 업데이트 (본인 정보만 수정 가능한 경우만 가정하였습니다.)
+   * 사용자 업데이트 => 로그인 한 사용자 정보 업데이트 (본인 정보만 수정 가능한 경우만 가정하였습니다.), 단 유저는 관리자 권한을 얻을 수 없음.
    */
+  @Roles(Role.ADMIN, Role.OPERATOR, Role.AUDITOR)
   @Patch('update')
   async update(@Req() req: AuthenticatedRequest, @Body() updateUserDto: UpdateUserDto): Promise<any> {
     try {

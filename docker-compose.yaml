@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # MongoDB 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DATABASE_NAME}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app_network
+
+  # 인증 마이크로서비스
+  auth-server:
+    build:
+      context: .
+      dockerfile: ./apps/auth-server/Dockerfile
+    container_name: auth-server
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRATION_TIME: ${JWT_REFRESH_EXPIRATION_TIME}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      DATABASE_URL: mongodb://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@mongodb:27017/${DATABASE_NAME}?authSource=admin
+    restart: always
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+  # 이벤트 마이크로서비스
+  event-server:
+    build:
+      context: .
+      dockerfile: ./apps/event-server/Dockerfile
+    container_name: event-server
+    environment:
+      DATABASE_URL: mongodb://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@mongodb:27017/${DATABASE_NAME}?authSource=admin
+    restart: always
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+  # API 게이트웨이
+  gateway-server:
+    build:
+      context: .
+      dockerfile: ./apps/gateway-server/Dockerfile
+    container_name: gateway-server
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      AUTH_SERVICE_HOST: auth-server
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      EVENT_SERVICE_HOST: event-server
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    depends_on:
+      - auth-server
+      - event-server
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

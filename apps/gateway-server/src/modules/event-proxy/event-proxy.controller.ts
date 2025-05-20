@@ -7,10 +7,12 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { CreateEventDto } from '../../../../libs/shared/dto/event/create-event.dto';
 import { FindEventsQueryDto } from '../../../../libs/shared/dto/event/find-events-query.dto';
+import { CreateRewardDto } from '../../../../libs/shared/dto/event/create-reward.dto';
 import { Roles } from '../../common/decorators/role.decorator';
 import { Role } from '../../common/decorators/role.enum';
-import { EventDocument } from 'apps/event-server/src/event/schemas/event.schema';
 import { Public } from '../../common/decorators/public.decorator';
+import { EventDocument } from '../../../../libs/shared/schemas/event.schema';
+import { RewardDocument } from '../../../../libs/shared/schemas/reward.schema';
 
 const EVENT_MESSAGE_PATTERNS = {
   CREATE_EVENT: 'event.create',
@@ -18,6 +20,8 @@ const EVENT_MESSAGE_PATTERNS = {
   FIND_ONE_EVENT: 'event.findOne',
   UPDATE_EVENT: 'event.update',
   DELETE_EVENT: 'event.delete',
+  CREATE_REWARD: 'reward.create',
+  FIND_ONE_REWARD: 'reward.findOne',
 };
 
 interface RequestWithUser extends Request {
@@ -79,6 +83,36 @@ export class EventProxyController {
       return firstValueFrom(this.eventClient.send(EVENT_MESSAGE_PATTERNS.FIND_ALL_EVENTS, query));
     } catch (error) {
       this.logger.error(`[Gateway] Error finding all events: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * 보상 생성
+   */
+  @Roles(Role.ADMIN, Role.OPERATOR)
+  @Post('rewards')
+  async createReward(@Body() createRewardDto: CreateRewardDto): Promise<{ result: string; id: string }> {
+    try {
+      this.logger.log(`[Gateway] Forwarding 'POST /v1/events/rewards' to EVENT_SERVICE`);
+      return firstValueFrom(this.eventClient.send(EVENT_MESSAGE_PATTERNS.CREATE_REWARD, createRewardDto));
+    } catch (error) {
+      this.logger.error(`[Gateway] Error creating reward: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * 보상 상세 조회
+   */
+  @Roles(Role.ADMIN, Role.OPERATOR)
+  @Get('rewards/:id')
+  async findOneReward(@Param('id') id: string): Promise<{ result: string; data: RewardDocument }> {
+    try {
+      this.logger.log(`[Gateway] Forwarding 'GET /v1/events/rewards/:id' to EVENT_SERVICE`);
+      return firstValueFrom(this.eventClient.send(EVENT_MESSAGE_PATTERNS.FIND_ONE_REWARD, id));
+    } catch (error) {
+      this.logger.error(`[Gateway] Error finding reward: ${error}`);
       throw error;
     }
   }

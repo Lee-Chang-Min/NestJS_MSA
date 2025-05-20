@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  MongooseModuleOptions,
-  MongooseOptionsFactory,
-} from '@nestjs/mongoose';
+import { MongooseModuleOptions, MongooseOptionsFactory } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 @Injectable()
@@ -21,15 +18,10 @@ export class MongooseConfigService implements MongooseOptionsFactory {
 
       connectionFactory: (connection: Connection) => {
         connection.once('open', () => {
-          this.logger.log(
-            '✅ MongoDB connection established from MongooseConfigService',
-          );
+          this.logger.log('✅ MongoDB connection established from MongooseConfigService');
         });
         connection.on('error', (error) => {
-          this.logger.error(
-            '❌ MongoDB connection error from MongooseConfigService',
-            error,
-          );
+          this.logger.error('❌ MongoDB connection error from MongooseConfigService', error);
         });
         return connection;
       },

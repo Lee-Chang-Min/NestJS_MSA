@@ -1,6 +1,12 @@
 import { IsOptional, IsString, IsEnum, IsInt, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventStatus } from 'apps/event-server/src/event/schemas/event.schema';
+
+enum EventStatus {
+  ACTIVE = 'active',
+  UPCOMING = 'upcoming',
+  EXPIRED = 'expired',
+}
+
 export class FindEventsQueryDto {
   /**
    * 필터링할 이벤트 상태

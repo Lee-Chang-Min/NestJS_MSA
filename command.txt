@@ -1,0 +1,12 @@
+[1] docker compose up -d --build
+
+*서비스 중지
+docker compose down, docker compose down -v (data 볼륨 연결 한것 까지 삭제)
+
+*서비스 재시작
+docker compose restart
+
+*모든 컨테이너 삭제
+docker compose down --rmi all
+
+

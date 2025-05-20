@@ -1,0 +1,277 @@
+{
+	"info": {
+		"_postman_id": "3827be67-35a7-417a-b256-c270746128c8",
+		"name": "maplestory",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36363046"
+	},
+	"item": [
+		{
+			"name": "gateway-server - 모든 라우팅",
+			"item": [
+				{
+					"name": "[AUTH] 회원가입",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"test1@test.com\", // 중복이 있으면 안됩니다\r\n  \"password\": \"dlckdals12!@\",\r\n  \"username\": \"이창민1\", // 중복이 있으면 안됩니다\r\n  \"role\": \"ADMIN\"  // 또는 \"OPERATOR\", \"AUDITOR\" 중 하나\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "[AUTH] 로그인",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"test@test.com\",\r\n  \"password\": \"dlckdals12!@\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "[AUTH] 로그아웃",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MDY2MDksImV4cCI6MTc0NzcxMDIwOX0.qo4UxRQQmYIDCpis_3bUjAxfe4k6xGEZsVBtdD3shbE",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:3000/v1/auth/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "[AUTH] 토큰 재발급",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJjMTcxYmQwY2MwZGE3ZDMyOGQ1MGQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTk5NzMsImV4cCI6MTc0NzcyMzU3M30.0eyfURPEoYeRdMIKzbibmbpVPTzfb6EGIW1QFr005dg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MDc2NDksImV4cCI6MTc0ODMxMjQ0OX0.hqjjVDefwqjDyqTGoBA1MOC6MhRXdWH5wTGBy7GoLr41\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/auth/refresh"
+					},
+					"response": []
+				},
+				{
+					"name": "[AUTH] 사용자 Role 정보 수정",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJjMTcxYmQwY2MwZGE3ZDMyOGQ1MGQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTk5NzMsImV4cCI6MTc0NzcyMzU3M30.0eyfURPEoYeRdMIKzbibmbpVPTzfb6EGIW1QFr005dg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"role\": \"ADMIN\"  // 또는 \"OPERATOR\", \"AUDITOR\" 중 하나\r\n}\r\n\r\n//유저는 관리자에 관한 권한을 얻을 수 없음.\r\n// ex User => OPERATOR",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/auth/update"
+					},
+					"response": []
+				},
+				{
+					"name": "[AUTH] 사용자 삭제",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJjMTcxYmQwY2MwZGE3ZDMyOGQ1MGQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTk5NzMsImV4cCI6MTc0NzcyMzU3M30.0eyfURPEoYeRdMIKzbibmbpVPTzfb6EGIW1QFr005dg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/auth/delete"
+					},
+					"response": []
+				},
+				{
+					"name": "[EVENT] 이벤트 등록",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc2NzM3NDEsImV4cCI6MTc0NzY3NzM0MX0.OnNzbeWMXywcDD7qyCezNRNEORtkz0fnw0zZH3BS34E",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"친구 초대 이벤트\",\r\n  \"description\": \"친구 3명을 초대하면 특별 보상을 제공하는 이벤트입니다.\",\r\n  \"conditions\": [\r\n    {\r\n      \"type\": \"FRIEND_INVITE\",\r\n      \"params\": {\r\n        \"count\": 3\r\n      }\r\n    }\r\n  ],\r\n  \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n  \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n  \"status\": \"active\"\r\n}\r\n\r\n// {\r\n//   \"name\": \"신규 회원 로그인 이벤트\",\r\n//   \"description\": \"7일 연속 로그인 시 특별 보상을 제공하는 이벤트입니다.\",\r\n//   \"conditions\": [\r\n//     {\r\n//       \"type\": \"LOGIN_STREAK\",\r\n//       \"params\": {\r\n//         \"days\": 7\r\n//       }\r\n//     }\r\n//   ],\r\n//   \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n//   \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n//   \"status\": \"active\"\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/events"
+					},
+					"response": []
+				},
+				{
+					"name": "[EVENT] 이벤트 상세 조회",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc2NzM3NDEsImV4cCI6MTc0NzY3NzM0MX0.OnNzbeWMXywcDD7qyCezNRNEORtkz0fnw0zZH3BS34E",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"신규 회원 로그인 이벤트\",\r\n  \"description\": \"7일 연속 로그인 시 특별 보상을 제공하는 이벤트입니다.\",\r\n  \"conditions\": [\r\n    {\r\n      \"type\": \"LOGIN_STREAK\",\r\n      \"params\": {\r\n        \"days\": 7\r\n      }\r\n    }\r\n  ],\r\n  \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n  \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n  \"status\": \"upcoming\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/events/682b62974c376f2bfb04021b"
+					},
+					"response": []
+				},
+				{
+					"name": "[EVENT] 이벤트 목록 조회",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc2NzM3NDEsImV4cCI6MTc0NzY3NzM0MX0.OnNzbeWMXywcDD7qyCezNRNEORtkz0fnw0zZH3BS34E",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/v1/events?page=1&limit=10&sortBy=createdAt&sortOrder=DESC",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"v1",
+								"events"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "DESC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[EVENT] 보상 생성",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJiZjZhNmYxM2Q4NmZiMmVjZjlkNGUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTE2OTksImV4cCI6MTc0NzcxNTI5OX0.vx_yZGk_iHEqsiyD42ZJLEZnyNaw5nAvVcB4o-BbWQI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"포인트 보상\", \r\n  \"type\": \"POINT\",  \r\n  \"eventId\": \"682b6ef2e3c42ab597f95b3c\", //유효한 Event ID 이여야 함\r\n  \"details\": {\r\n    \"pointAmount\": 1000,\r\n    \"description\": \"친구 초대 이벤트 참여 보상 포인트\"\r\n  },\r\n  \"quantity\": 1,\r\n  \"metadata\": {\r\n  }\r\n}\r\n\r\n//하나의 이벤트에 여러개 보상 등록 가능\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:3000/v1/events/rewards"
+					},
+					"response": []
+				},
+				{
+					"name": "[EVENT] 보상 정보 조회",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJiZjZhNmYxM2Q4NmZiMmVjZjlkNGUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTE2OTksImV4cCI6MTc0NzcxNTI5OX0.vx_yZGk_iHEqsiyD42ZJLEZnyNaw5nAvVcB4o-BbWQI",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:3000/v1/events/rewards/682bf8153def8618275a1888"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

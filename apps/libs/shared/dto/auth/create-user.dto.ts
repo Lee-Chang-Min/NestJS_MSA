@@ -1,8 +1,13 @@
 // src/users/dto/create-user.dto.ts
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-// import { UserRole } from 'apps/auth-server/src/users/schemas/users.schema';
-import { UserRole } from '../../../../auth-server/src/users/schemas/users.schema';
+
+enum UserRole {
+  USER = 'USER',
+  OPERATOR = 'OPERATOR',
+  AUDITOR = 'AUDITOR',
+  ADMIN = 'ADMIN',
+}
 
 export class CreateUserDto {
   @ApiProperty({
