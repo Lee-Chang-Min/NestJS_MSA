@@ -37,12 +37,6 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
-
-  @Prop({ type: String, select: false }) // 기본적으로 조회되지 않도록 select: false 설정
-  refreshToken?: string;
-
-  @Prop({ type: Date, select: false }) // 리프레시 토큰 발급 시간
-  rtIssuedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
