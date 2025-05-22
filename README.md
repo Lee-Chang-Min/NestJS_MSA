@@ -246,6 +246,41 @@ apps/
 }
 ```
 
+### 이벤트 진행 상태 (EventProgress)
+
+```typescript
+{
+  _id: ObjectId,
+  userId: ObjectId,            // User 참조, 필수, 인덱스
+  eventId: ObjectId,           // Event 참조, 필수, 인덱스
+  eventConditionIndex: Number, // 이벤트 조건 배열 내 인덱스, 필수
+  progress: Object,            // 조건 진행 상태 (동적 구조), 필수
+  isCompleted: Boolean,        // 조건 완료 여부, 기본값: false
+  createdAt: Date,             // 자동 생성
+  updatedAt: Date              // 자동 생성
+}
+```
+
+### 보상 요청 처리 (RewardClaim)
+
+```typescript
+{
+  _id: ObjectId,
+  userId: ObjectId,            // User 참조, 필수, 인덱스
+  eventId: ObjectId,           // Event 참조, 필수, 인덱스
+  rewardId: ObjectId,          // Reward 참조, 필수
+  claimedQuantity: Number,     // 수령한 보상 개수, 기본값: 1, 최소값: 1
+  status: Enum(PENDING_APPROVAL, AUTO_APPROVED, REJECTED, SUCCESS, ERROR), // 기본값: PENDING_APPROVAL
+  resolutionNotes: String,     // 처리 결과 노트 (예: 거절 사유), 옵션
+  processedBy: ObjectId,       // 처리한 관리자/운영자 참조, 옵션
+  processedAt: Date,           // 처리 시간, 옵션
+  createdAt: Date,             // 자동 생성
+  updatedAt: Date              // 자동 생성
+}
+```
+
+
+
 ## HISTORY
 
 #### 프로젝트 설계할때 과하게 폴더 구조화 하지 않고 최대한 직관적으로 빠르게 파악 할 수 있게 구조화 하는게 가장 큰 목표로 하였습니다.
@@ -277,9 +312,9 @@ apps/
 - **테스트 코드 미작성**
 
 ### 2. 구현 미비 영역
-- `/event-server/src/request-reward` 디렉토리 내:
+- `/event-server/src/reward-claim` 디렉토리 내:
   - **보상 요청 처리 및 내역 확인 로직** 미완성
-  - 프로젝트 초기 구조 설계에 시간을 많이 소비하여, 해당 로직에서 구현하지 못한 것이 아쉽습니다.
+  - 프로젝트 초기 구조 설계에 시간을 많이 소비하여, 해당 로직에서 구현하지 못한 것이 아쉽습니다. => CQRS 패턴 적용
     - **DB 동시성 제어** 전략: 비관적 락 vs 낙관적 락
     - **중복 요청 방지 및 재처리 정책** 
     - **정합성 유지를 위한 트랜잭션 처리**
