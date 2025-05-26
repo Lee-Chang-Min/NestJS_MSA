@@ -15,6 +15,12 @@ export enum EventStatus {
   EXPIRED = 'expired',
 }
 
+// 이벤트 승인 타입을 위한 Enum 추가
+export enum EventApprovalType {
+  AUTO = 'auto', // 자동 승인
+  MANUAL = 'manual', // 관리자 검토 필요
+}
+
 @Schema({ timestamps: true, collection: 'events' }) // timestamps: createdAt, updatedAt 자동 생성, collection: MongoDB 컬렉션 이름 명시
 export class Event {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
@@ -45,6 +51,14 @@ export class Event {
     default: EventStatus.UPCOMING,
   })
   status: EventStatus;
+
+  /** 이벤트 승인 타입 (자동 승인 또는 관리자 검토 필요) */
+  @Prop({
+    required: true,
+    type: String,
+    enum: Object.values(EventApprovalType),
+  })
+  approvalType: EventApprovalType;
 
   /**
    * 이벤트를 생성한 운영자/관리자의 User ID (Auth Server의 User ID 참조)

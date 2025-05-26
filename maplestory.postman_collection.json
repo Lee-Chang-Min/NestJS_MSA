@@ -34,7 +34,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"test@test.com\",\r\n  \"password\": \"dlckdals12!@\"\r\n}",
+							"raw": "{\r\n  \"email\": \"test1@test.com\",\r\n  \"password\": \"dlckdals12!@\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -139,13 +139,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODI5Y2RkNzcxNmIwOTY5NTIzZTU0MzQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc2NzM3NDEsImV4cCI6MTc0NzY3NzM0MX0.OnNzbeWMXywcDD7qyCezNRNEORtkz0fnw0zZH3BS34E",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJlZTllNjYyZGIyZGIyZTY0NWYxOTYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc5MDUwMDgsImV4cCI6MTc0NzkwODYwOH0.enZ7pYACpCbJovsBjY7bVkm2NPK-8OohKzTAGcx-Dkk",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"친구 초대 이벤트\",\r\n  \"description\": \"친구 3명을 초대하면 특별 보상을 제공하는 이벤트입니다.\",\r\n  \"conditions\": [\r\n    {\r\n      \"type\": \"FRIEND_INVITE\",\r\n      \"params\": {\r\n        \"count\": 3\r\n      }\r\n    }\r\n  ],\r\n  \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n  \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n  \"status\": \"active\"\r\n}\r\n\r\n// {\r\n//   \"name\": \"신규 회원 로그인 이벤트\",\r\n//   \"description\": \"7일 연속 로그인 시 특별 보상을 제공하는 이벤트입니다.\",\r\n//   \"conditions\": [\r\n//     {\r\n//       \"type\": \"LOGIN_STREAK\",\r\n//       \"params\": {\r\n//         \"days\": 7\r\n//       }\r\n//     }\r\n//   ],\r\n//   \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n//   \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n//   \"status\": \"active\"\r\n// }",
+							"raw": "{\r\n  \"name\": \"친구 초대 이벤트\",\r\n  \"description\": \"친구 3명을 초대하면 특별 보상을 제공하는 이벤트입니다.\",\r\n  \"conditions\": [\r\n    {\r\n      \"type\": \"FRIEND_INVITE\",\r\n      \"params\": {\r\n        \"count\": 3\r\n      }\r\n    }\r\n  ],\r\n  \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n  \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n  \"status\": \"active\",\r\n  \"approvalType\": \"auto\"\r\n}\r\n\r\n// {\r\n//   \"name\": \"신규 회원 로그인 이벤트\",\r\n//   \"description\": \"7일 연속 로그인 시 특별 보상을 제공하는 이벤트입니다.\",\r\n//   \"conditions\": [\r\n//     {\r\n//       \"type\": \"LOGIN_STREAK\",\r\n//       \"params\": {\r\n//         \"days\": 7\r\n//       }\r\n//     }\r\n//   ],\r\n//   \"startDate\": \"2025-05-19T14:30:15+09:00\",\r\n//   \"endDate\": \"2026-06-01T00:00:15+09:00\",\r\n//   \"status\": \"active\"\r\n// }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -239,13 +239,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJiZjZhNmYxM2Q4NmZiMmVjZjlkNGUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc3MTE2OTksImV4cCI6MTc0NzcxNTI5OX0.vx_yZGk_iHEqsiyD42ZJLEZnyNaw5nAvVcB4o-BbWQI",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2ODJlZTllNjYyZGIyZGIyZTY0NWYxOTYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDc5MDUwMDgsImV4cCI6MTc0NzkwODYwOH0.enZ7pYACpCbJovsBjY7bVkm2NPK-8OohKzTAGcx-Dkk",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"포인트 보상\", \r\n  \"type\": \"POINT\",  \r\n  \"eventId\": \"682b6ef2e3c42ab597f95b3c\", //유효한 Event ID 이여야 함\r\n  \"details\": {\r\n    \"pointAmount\": 1000,\r\n    \"description\": \"친구 초대 이벤트 참여 보상 포인트\"\r\n  },\r\n  \"quantity\": 1,\r\n  \"metadata\": {\r\n  }\r\n}\r\n\r\n//하나의 이벤트에 여러개 보상 등록 가능\r\n",
+							"raw": "{\r\n  \"name\": \"포인트 보상\", \r\n  \"type\": \"POINT\",  \r\n  \"eventId\": \"682eea13b12e59637707f9f6\", //유효한 Event ID 이여야 함\r\n  \"details\": {\r\n    \"pointAmount\": 1000,\r\n    \"description\": \"친구 초대 이벤트 참여 보상 포인트\"\r\n  },\r\n  \"quantity\": 1,\r\n  \"metadata\": {\r\n  }\r\n}\r\n\r\n//하나의 이벤트에 여러개 보상 등록 가능\r\n",
 							"options": {
 								"raw": {
 									"language": "json"

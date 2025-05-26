@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsObject, ValidateNested, IsMongoId, MaxLength, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventStatus } from '../schemas/event.schema'; // 이전 단계에서 생성한 스키마의 Enum
+import { EventStatus, EventApprovalType } from '../schemas/event.schema'; // 이전 단계에서 생성한 스키마의 Enum
 
 // 이벤트 조건에 대한 DTO (필요에 따라 더 구체화 가능)
 export class EventConditionDto {
@@ -45,6 +45,10 @@ export class CreateEventDto {
   @IsEnum(EventStatus)
   @IsOptional()
   status?: EventStatus = EventStatus.UPCOMING; // 기본 상태를 UPCOMING으로 설정
+
+  @IsEnum(EventApprovalType)
+  @IsNotEmpty()
+  approvalType: EventApprovalType;
 
   /**
    * 이벤트를 생성한 운영자/관리자의 User ID (Auth Server의 User ID)

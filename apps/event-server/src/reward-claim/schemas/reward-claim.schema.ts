@@ -24,7 +24,7 @@ export class RewardClaim {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Event', required: true, index: true })
   eventId: Types.ObjectId;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Reward', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Reward', required: true, index: true })
   rewardId: Types.ObjectId;
 
   @Prop({ type: Number, default: 1, min: 1 })
