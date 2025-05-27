@@ -19,11 +19,6 @@
   <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
 </p>
 
-## 소개
-
-안녕하세요. 이번 과제를 맡게된 백엔드 개발자 이창민입니다.
-
-📋 [**저를 소개 합니다:)** ](https://respected-wasp-a92.notion.site/174bfc29a92f80b5bf78e73500262c17)
 
 ## 🛠️ 프로젝트 설정
 
