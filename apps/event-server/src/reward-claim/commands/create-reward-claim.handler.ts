@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
-import { CreateRewardClaimCommand } from '../impl/create-reward-claim.command';
-import { RewardClaimDocument } from '../../schemas/reward-claim.schema';
-import { RewardClaimRepository } from '../../repository/reward-claim.repository';
-import { EventProgressRepository } from '../../repository/event-progress.repository';
-import { EventStatus, ConditionDef, EventApprovalType } from '../../../event/schemas/event.schema';
-import { EventService } from '../../../event/event.service';
+import { CreateRewardClaimCommand } from './create-reward-claim.command';
+import { RewardClaimDocument } from '../schemas/reward-claim.schema';
+import { RewardClaimRepository } from '../repository/reward-claim.repository';
+import { EventProgressRepository } from '../repository/event-progress.repository';
+import { EventStatus, ConditionDef, EventApprovalType } from '../../event/schemas/event.schema';
+import { EventService } from '../../event/event.service';
 // 예시: import { RewardClaimRequestedEvent } from '../../events/impl/reward-claim-requested.event';
 
 @CommandHandler(CreateRewardClaimCommand)

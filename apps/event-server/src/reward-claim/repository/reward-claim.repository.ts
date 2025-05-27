@@ -1,8 +1,6 @@
-// src/reward_clame/repositories/reward-request.repository.ts
-
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { RewardClaim, RewardClaimDocument } from '../schemas/reward-claim.schema';
 
 @Injectable()
@@ -11,6 +9,10 @@ export class RewardClaimRepository {
     @InjectModel(RewardClaim.name)
     private readonly model: Model<RewardClaimDocument>,
   ) {}
+
+  async rewardClaimList(filter: FilterQuery<RewardClaimDocument>): Promise<RewardClaimDocument[]> {
+    return this.model.find(filter).exec();
+  }
 
   async findByUserAndReward(userId: Types.ObjectId, eventId: Types.ObjectId, rewardId: Types.ObjectId): Promise<RewardClaimDocument | null> {
     return this.model.findOne({ userId, eventId, rewardId }).exec();
